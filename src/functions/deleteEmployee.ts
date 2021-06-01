@@ -1,30 +1,31 @@
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import {document} from '../utils/dynamoDbClient';
-import {DocumentClient} from 'aws-sdk/lib/dynamodb/document_client';
 import {AWSError} from 'aws-sdk';
 
-
-export const handle = async () => {
-   
-    const params = {
-        TableName: "employees"
-    };
+export const handle: APIGatewayProxyHandler = async (event) => {
+    
+    const {id} = event.pathParameters;
     let message = "";
-    const Items = [];
     let errorHappened = false;
 
-    await document.scan(params, onScan).promise();
-    
 
-    function onScan(err: AWSError, data: DocumentClient.ScanOutput){
-        
-        if(err){
-            message = "Unable to scan the table. Error JSON:" + JSON.stringify(err, null, 2);
-            errorHappened = true;
-            
-        }
-        Items.push(data.Items);
-      
+    const params = {
+        TableName: "employees",
+        Key: {
+            id
+        },
+        ConditionExpression: 'attribute_exists(id)'
     }
+
+
+    await document.delete(params, (err: AWSError) => {
+        if(err){
+            message = "Unable to update item. Error JSON:" + JSON.stringify(err, null, 2);
+            errorHappened = true;
+        } else {
+            message = `Employee with id ${id} deleted`
+        }
+    }).promise();
 
     if(errorHappened){
         return {
@@ -39,11 +40,12 @@ export const handle = async () => {
     } else {
         return {
             statusCode: 200,
-            body: JSON.stringify(Items[0]),
+            body: JSON.stringify({
+                message
+            }),
             headers: {
                 "Content-type": "application/json"
                 }
          }
     }
-
-}
+};

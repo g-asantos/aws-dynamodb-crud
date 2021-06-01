@@ -40,6 +40,27 @@ functions:
           path: /getAllEmployees
           method: GET
           cors: true
+  getAllEmployeeById:
+    handler: src/functions/getEmployeeById.handle
+    events:
+      - http:
+          path: /getEmployeeById/{id}
+          method: GET
+          cors: true
+  updateEmployee:
+    handler: src/functions/updateEmployee.handle
+    events:
+      - http:
+          path: /updateEmployee/{id}
+          method: PUT
+          cors: true
+  deleteEmployee:
+    handler: src/functions/deleteEmployee.handle
+    events:
+      - http:
+          path: /deleteEmployee/{id}
+          method: DELETE
+          cors: true
 
 resources:
   Resources:
