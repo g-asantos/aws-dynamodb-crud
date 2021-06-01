@@ -24,6 +24,10 @@ provider:
   name: aws
   runtime: nodejs14.x
   region: sa-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Actions:
+        - dynamodb:*
 
 functions:
   createEmployee:
@@ -33,6 +37,12 @@ functions:
           path: /createEmployee
           method: POST
           cors: true
+    iamRoleStatements:
+    - Effect: Allow
+      Actions:
+        - dynamodb:Query
+        - dynamodb:PutItem
+    Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/employees"
   getAllEmployees:
     handler: src/functions/getAllEmployees.handle
     events:
@@ -40,6 +50,11 @@ functions:
           path: /getAllEmployees
           method: GET
           cors: true
+    iamRoleStatements:
+    - Effect: Allow
+      Actions:
+        - dynamodb:Query
+    Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/employees"
   getAllEmployeeById:
     handler: src/functions/getEmployeeById.handle
     events:
@@ -47,6 +62,11 @@ functions:
           path: /getEmployeeById/{id}
           method: GET
           cors: true
+    iamRoleStatements:
+    - Effect: Allow
+      Actions:
+        - dynamodb:Query
+    Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/employees"
   updateEmployee:
     handler: src/functions/updateEmployee.handle
     events:
@@ -54,6 +74,12 @@ functions:
           path: /updateEmployee/{id}
           method: PUT
           cors: true
+    iamRoleStatements:
+    - Effect: Allow
+      Actions:
+        - dynamodb:Query
+        - dynamodb:UpdateItem
+    Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/employees"
   deleteEmployee:
     handler: src/functions/deleteEmployee.handle
     events:
@@ -61,6 +87,12 @@ functions:
           path: /deleteEmployee/{id}
           method: DELETE
           cors: true
+    iamRoleStatements:
+    - Effect: Allow
+      Actions:
+        - dynamodb:Query
+        - dynamodb:DeleteItem
+    Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/employees"
 
 resources:
   Resources:
